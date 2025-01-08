@@ -13,6 +13,10 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    cancellationRequest: {
+      type: Boolean,
+      default: false
+    },
     products: [
       {
         product: {

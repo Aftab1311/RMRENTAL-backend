@@ -351,6 +351,34 @@ exports.deleteOrder = async (req, res) => {
   }
 };
 
+exports.raiseCancelRequest = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    if (!orderId) {
+      return res.status(400).json({
+        success: false,
+        error: "Please provide orderId",
+      });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { cancellationRequest: true },
+      { new: true }
+    )
+
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
+
+    res.status(200).json({ success: true, data: order });
+
+  } catch (error) {
+    console.log("error in cancel request: ", error);
+  }
+}
+
 exports.addToCart = async (req, res) => {
   try {
     const { items } = req.body; // Get items from request body
@@ -476,7 +504,7 @@ exports.updateCart = async (req, res) => {
 exports.updateCartQuantity = async (req, res) => {
   try {
     const { userCartNewData, userId } = req.body // this will be the array of new cart data
-    
+
     const cart = await CartSchema.findOne({ user: userId })
     cart.items = userCartNewData
     await cart.save()
